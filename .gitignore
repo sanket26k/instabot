@@ -1,6 +1,5 @@
 /.vscode
-/logs.log
-/main.ipynb
-/posts.log
-/users.log
 /__pycache__
+*.pyc
+*.ipynb
+*.log

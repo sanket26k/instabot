@@ -115,6 +115,8 @@ class FollowBot():
         if self.post+'\n' not in all_posts:
             with open('posts.log','a') as f:
                 f.write(self.post+'\n')
+        else:
+            self.get_random_post()
         self.driver.get(self.post)
         self.rand_sleep()
         
