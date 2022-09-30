@@ -94,18 +94,6 @@ class FollowBot():
         self.click(not_now_xpath)
         self.click(not_now_xpath)   
 
-    def search(self):
-        box = self.driver.find_element_by_class_name(search_class_name)
-        search_term = "#" + choice(hashtags)
-        self.logger.info(f"Searhing for {search_term}")
-        box.send_keys(search_term)
-        WebDriverWait(self.driver, max_delay).until(lambda browser: box.get_attribute('value') == search_term)
-        self.rand_sleep()
-        box.send_keys(Keys.ENTER)
-        self.rand_sleep()
-        box.send_keys(Keys.ENTER)
-        self.rand_sleep(4,7)
-
     def scroll_down(self, n_scrolls = 20):
         SCROLL_PAUSE_TIME = 2
 
