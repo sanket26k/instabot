@@ -5,24 +5,34 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.keys import Keys
+import getpass
 
 
 from time import sleep
 from random import randint, choice
 import logging
 
-from .credentials import username, password
-from .constants import max_delay, login_button_xpath, hashtags, \
-    not_now_xpath, instagram_url, search_class_name, follow_xpath, \
+from .constants import max_delay, login_button_xpath, \
+    not_now_xpath, instagram_url, follow_xpath, \
     unfollow_xpath, unfollow_button_xpath, unrequest_xpath, fl_daily_user
 
 from .file_handler import FileHandler
+from .gui import Gui
 
 class FollowBot():
     def __init__(self):
         self.post = []
         self.logger_init()
         self.file_handler = FileHandler()
+        self.credentials = self.file_handler.get_credentials()
+        # self.gui = Gui()
+        # self.gui.enter_user_pw()
+        if not self.credentials:
+            user = input("Username:")
+            passwd = getpass.getpass("Password for " + user + ":")
+            self.file_handler.enter_credentials(user, passwd)
+            self.credentials = self.file_handler.get_credentials()
+
         self.start_selenium()
         self.login()
 
@@ -78,8 +88,8 @@ class FollowBot():
         self.rand_sleep()
 
     def login(self):
-        self.type_in("username", username)
-        self.type_in("password", password)
+        self.type_in("username", self.credentials['username'])
+        self.type_in("password", self.credentials['password'])
         self.click(login_button_xpath)
         self.click(not_now_xpath)
         self.click(not_now_xpath)   
