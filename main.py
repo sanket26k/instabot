@@ -1,9 +1,8 @@
-from insta_follow_module.FollowBot import FollowBot
+from insta_follow_module.follow_bot import FollowBot
+from time import sleep
+
+FIFTY_EIGHT_MINUTES = 58*60
 
 bot = FollowBot()
-bot.login()
-bot.go_to_profile()
-# bot.search()
-bot.follow_loop()
-# bot.unfollow_loop() 
- 
+
+bot.start_loop()
