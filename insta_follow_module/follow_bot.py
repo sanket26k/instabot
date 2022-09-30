@@ -20,6 +20,7 @@ from .file_handler import FileHandler
 
 class FollowBot():
     def __init__(self):
+        self.post = []
         self.logger_init()
         self.file_handler = FileHandler()
         self.start_selenium()
@@ -83,7 +84,6 @@ class FollowBot():
         self.click(not_now_xpath)
         self.click(not_now_xpath)   
 
-
     def search(self):
         box = self.driver.find_element_by_class_name(search_class_name)
         search_term = "#" + choice(hashtags)
@@ -96,7 +96,7 @@ class FollowBot():
         box.send_keys(Keys.ENTER)
         self.rand_sleep(4,7)
 
-    def scroll_down(self, n_scrolls = 10):
+    def scroll_down(self, n_scrolls = 20):
         SCROLL_PAUSE_TIME = 2
 
         # Get scroll height
@@ -120,10 +120,10 @@ class FollowBot():
         self.driver.get(instagram_url+fl_daily_user)
         self.rand_sleep()
 
-
     def update_posts(self):
         self.go_to_profile()
         self.rand_sleep(5,8)
+        self.scroll_down()
         self.posts = self.file_handler.load('posts')
         posts = dict()
         links = self.driver.find_elements_by_tag_name('a')
@@ -139,17 +139,20 @@ class FollowBot():
         self.rand_sleep()
 
     def get_post(self):
+        if all(value != 0 for value in self.posts.values()):
+            self.update_posts()
         for post, read in self.posts.items():
             self.post = post
             if not read:
-                self.driver.get(post)
+                self.driver.get(self.post)
                 self.rand_sleep()
-                self.posts[post] = 1
+                self.posts[self.post] += 1
                 self.file_handler.dump('posts', self.posts)
                 break
 
-
     def update_likers(self):
+        if not self.post:
+            self.get_post()
         self.likers = self.file_handler.load('likers')
         self.driver.get(self.driver.current_url + "liked_by")
         self.rand_sleep()
@@ -165,6 +168,8 @@ class FollowBot():
         self.file_handler.dump('likers', self.likers)
 
     def go_to_liker(self, follow_check = 0):
+        if all(value != follow_check for value in self.likers.values()):
+            self.update_likers()
         for user, followed in self.likers.items():
             if followed==follow_check:
                 self.driver.get(instagram_url + user)
@@ -172,7 +177,6 @@ class FollowBot():
                 self.likers[user] = follow_check+1
                 self.file_handler.dump('likers', self.likers)
                 break
-
     
     def get_all_commenters(self):
         self.commenters = []
@@ -185,7 +189,6 @@ class FollowBot():
                     self.commenters.append(attr)
         self.commenters = list(set(self.commenters))
         self.number_of_comments = len(self.commenters)
-        
         
     def get_random_liker(self):
         user = choice(self.likers)
@@ -201,25 +204,7 @@ class FollowBot():
             return True
         else:
             return False
-
-    def get_random_commenter(self):
-        # if not self.commenters:
-        #     self.get_all_commenters()
-        user = choice(self.commenters)
-        self.commenters.remove(user)
-        with open('users.log', 'r') as f:
-            all_followed_users = f.readlines()
-        if user+'\n' not in all_followed_users:
-            with open('users.log','a') as f:
-                f.write(user+'\n')
-            user_link = instagram_url + user 
-            self.driver.get(user_link)
-            self.rand_sleep()
-            return True
-        else:
-            return False
-
-
+      
     def follow_loop(self, max_per_hour = 10):
         # loop counter of number of users followed, max_daily_limit < 149
 
@@ -231,7 +216,7 @@ class FollowBot():
             self.click(follow_xpath)
             self.rand_sleep()
             counter+=1
-
+                
     def unfollow_loop(self, max_per_hour = 10):
         self.likers = self.file_handler.load('likers')
         counter = 0
@@ -244,11 +229,10 @@ class FollowBot():
             self.rand_sleep()
             counter+=1
 
-
     def start_loop(self):
         self.update_posts() # update daily?
-        # self.get_post() # update when run out of likers?
-        # self.follow_loop()
-        # sleep(30*60)
-        self.unfollow_loop()
-        # sleep(30*60)
+        for i in range(12):
+            self.follow_loop()
+            sleep(30*60)
+            self.unfollow_loop()
+            sleep(30*60)
