@@ -237,10 +237,8 @@ class FollowBot():
         counter = 0
         while counter <= max_per_hour:
             self.go_to_liker(follow_check=1)
-            unfollow_xpath):
-                self.click(unfollow_xpath)
-            else:
-                self.click(unrequest_xpath)
+            self.click(unfollow_xpath)
+            self.click(unrequest_xpath)
             self.rand_sleep()
             self.click(unfollow_button_xpath)
             self.rand_sleep()
