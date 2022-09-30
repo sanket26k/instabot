@@ -7,9 +7,7 @@ class FileHandler():
     def __init__(self):
         self.data_files = [
             "posts.json",
-            "likers.json",
-            "followed_users.json",
-            "all_users.json"
+            "likers.json"
         ]
         self.data_folder_path = pathlib.Path().resolve()  / "data"
         self.check_data_folder()        
