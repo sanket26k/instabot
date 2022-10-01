@@ -30,7 +30,7 @@ class FileHandler():
     
     def dump(self, filename, data):
         with open(self.data_folder_path / (filename+'.json'), 'w') as f:
-            json.dump(data, f)
+            json.dump(data, f, indent=2)
 
 
     def load(self, filename):
