@@ -227,9 +227,9 @@ class FollowBot():
             self.rand_sleep()
             counter+=1
 
-    def start_loop(self):
+    def start_loop(self, n_hours=24):
         self.update_posts() # update daily?
-        for i in range(12):
+        for i in range(n_hours):
             self.follow_loop()
             sleep(30*60)
             self.unfollow_loop()
