@@ -63,14 +63,14 @@ class FollowBot():
         self.driver.implicitly_wait(max_delay)
         self.driver.maximize_window()
         self.driver.get(instagram_url)
-        self.rand_sleep(2,3)
-        try:
-            self.logger.info("Waiting for page to load")
-            myElem = WebDriverWait(self.driver, max_delay).until(EC.presence_of_element_located((By.ID, 'react-root')))
-        except TimeoutException:
-            self.logger.error("Couldn't load instagram home page")
-        finally:
-            self.logger.info("Instagram Homepage loaded")
+        self.rand_sleep(8,10)
+        # try:
+        #     self.logger.info("Waiting for page to load")
+        #     myElem = WebDriverWait(self.driver, max_delay).until(EC.presence_of_element_located((By.ID, 'react-root')))
+        # except TimeoutException:
+        #     self.logger.error("Couldn't load instagram home page")
+        # finally:
+        #     self.logger.info("Instagram Homepage loaded")
         
     def type_in(self, element_name, value):
         WebDriverWait(self.driver, max_delay).until(EC.presence_of_element_located((By.NAME, element_name)))
