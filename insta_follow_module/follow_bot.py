@@ -36,6 +36,10 @@ class FollowBot():
         self.start_selenium()
         self.login()
 
+    def __del__(self):
+        self.driver.close()
+
+
     @staticmethod
     def rand_sleep(min=1, max=5):
         time = randint(min, max)
