@@ -46,11 +46,15 @@ class FollowBot():
         sleep(time)
 
     def check_exists_by_xpath(self, xpath):
-        elem = self.driver.find_elements_by_xpath(xpath)
-        if len(elem) > 0:
-            return True
-        return False
-
+        found = False
+        try:
+            elem = self.driver.find_element(By.XPATH, xpath)
+            if len(elem.size):
+                found = True
+        except:
+            pass
+        return found
+        
     def logger_init(self):
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.INFO)
@@ -78,7 +82,7 @@ class FollowBot():
         
     def type_in(self, element_name, value):
         WebDriverWait(self.driver, max_delay).until(EC.presence_of_element_located((By.NAME, element_name)))
-        box = self.driver.find_element_by_name(element_name)
+        box = self.driver.find_element(By.NAME, element_name)
         self.logger.info(f"Found {element_name} box, typing...")
         box.send_keys(value)
         WebDriverWait(self.driver, max_delay).until(lambda browser: box.get_attribute('value') == value)
@@ -88,7 +92,7 @@ class FollowBot():
             return
         WebDriverWait(self.driver, max_delay).until(EC.presence_of_element_located((By.XPATH, xpath)))
         self.logger.info(f"Clicking {xpath}")
-        self.driver.find_element_by_xpath(xpath).click()
+        self.driver.find_element(By.XPATH, xpath).click()
         self.rand_sleep()
 
     def login(self):
@@ -128,7 +132,7 @@ class FollowBot():
         self.scroll_down()
         self.posts = self.file_handler.load('posts')
         posts = dict()
-        links = self.driver.find_elements_by_tag_name('a')
+        links = self.driver.find_elements(By.TAG_NAME, 'a')
         for link in links:
             post = link.get_attribute('href')
             if '/p/' in post:
@@ -159,7 +163,7 @@ class FollowBot():
         self.driver.get(self.driver.current_url + "liked_by")
         self.rand_sleep()
         self.scroll_down()
-        links = self.driver.find_elements_by_tag_name('a')
+        links = self.driver.find_elements(By.TAG_NAME, 'a')
         for link in links:
             attr = link.get_attribute('href')
             if attr.startswith(instagram_url):
@@ -182,7 +186,7 @@ class FollowBot():
     
     def get_all_commenters(self):
         self.commenters = []
-        links = self.driver.find_elements_by_tag_name('a')
+        links = self.driver.find_elements(By.TAG_NAME, 'a')
         for link in links:
             attr = link.get_attribute('href')
             if attr.startswith(instagram_url):
