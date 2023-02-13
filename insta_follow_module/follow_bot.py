@@ -92,8 +92,10 @@ class FollowBot():
             return
         WebDriverWait(self.driver, max_delay).until(EC.presence_of_element_located((By.XPATH, xpath)))
         self.logger.info(f"Clicking {xpath}")
-        self.driver.find_element(By.XPATH, xpath).click()
+        element = self.driver.find_element(By.XPATH, xpath)
+        element.click()
         self.rand_sleep()
+        return element
 
     def login(self):
         self.type_in("username", self.credentials['username'])
@@ -123,7 +125,7 @@ class FollowBot():
             n += 1
 
     def go_to_profile(self, user = fl_daily_user):
-        self.driver.get(instagram_url+fl_daily_user)
+        self.driver.get(instagram_url+user)
         self.rand_sleep()
 
     def update_posts(self):
@@ -242,3 +244,64 @@ class FollowBot():
             sleep(30*60)
             self.unfollow_loop()
             sleep(30*60)
+
+# update for valeriol4v
+    def go_to_my_profile(self):
+        self.go_to_profile(user=self.credentials['username'])
+
+    def get_set(self, type):
+        f = set()
+        self.go_to_my_profile()
+        self.rand_sleep()
+        el = self.driver.find_element(By.PARTIAL_LINK_TEXT, type)
+        n_f = int(str(el.text.split()[0]).replace(",",""))
+        self.rand_sleep()
+        self.driver.get(self.driver.current_url + type)
+        self.rand_sleep()
+        pop_up = self.driver.find_element(By.CLASS_NAME, '_aano')
+
+        attempts = 1000
+        while len(f) < n_f:
+            before = len(f)
+            links = self.driver.find_elements(By.TAG_NAME, 'a')
+            links = links[55:]
+            for link in links:
+                f.add(link.get_attribute('href'))
+            # scroll down
+            sleep(0.2)
+            self.driver.execute_script("arguments[0].scrollBy(0,arguments[0].scrollHeight)", pop_up)
+            after = len(f)
+            if before==after:
+                attempts -= 1
+                if not attempts:
+                    break
+
+    def get_follower_list(self):
+        self.rand_sleep()
+        return self.get_set('followers')
+        
+
+    def get_following_list(self):
+        self.rand_sleep()
+        return self.get_set('following')
+
+
+    def unfollow_non_followers(self, n_per_hour=20):
+        followers =  self.get_follower_list()
+        following =  self.get_following_list()
+        unfollow_set = following - followers
+        counter = 0
+        while len(unfollow_set):
+            if counter >= n_per_hour:
+                sleep(60*60)
+                counter = 0
+            user = unfollow_set.pop()
+            self.driver.get(user)
+            self.click(unfollow_xpath)
+            self.click(unrequest_xpath) # in case they're private and haven't accepted req
+            self.rand_sleep()
+            self.click(unfollow_button_xpath)
+            self.rand_sleep()
+            counter+=1
+            self.rand_sleep(30,60)
+        print("Unfollowed everyone who you follow but don't follow you back for now")
