@@ -275,6 +275,7 @@ class FollowBot():
                 attempts -= 1
                 if not attempts:
                     break
+        return f
 
     def get_follower_list(self):
         self.rand_sleep()
